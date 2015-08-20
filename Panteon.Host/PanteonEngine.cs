@@ -152,6 +152,7 @@ namespace Panteon.Host
                     {
                         TaskModel taskModel = _taskModelDictionary.AddOrUpdate(pair.Key, pair.Value,
                             (s, model) =>
+                                /*TODO: change detection*/
                                 pair.Value.Container.GetHashCode() != model.Container.GetHashCode() ? pair.Value : model);
 
                         taskModel?.Task?.Bootstrap();
