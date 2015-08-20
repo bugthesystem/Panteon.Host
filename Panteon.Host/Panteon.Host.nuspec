@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Panteon.Host</id>
+    <version>1.0.4</version>
+    <title>Panteon.Host</title>
+    <authors>ziyasal</authors>
+    <owners>ziyasal</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>description</description>
+    <releaseNotes>Summary of changes made in this release of the package.</releaseNotes>
+    <copyright>copyleft</copyright>
+    <tags>task scheduler</tags>
+  </metadata>
+  <files>
+    <file src="bin\Debug\**\*.*" exclude="bin\Debug\*.ps1;bin\Debug\Tasks\*.dll.config;" target="Debug"/>
+    <file src="bin\Release\**\*.*" exclude="bin\Release\*.ps1;bin\Release\Tasks\*.dll.config;" target="Release"/>
+    <file src="bin\Release\Deploy.ps1"/>
+  </files>
+</package>
