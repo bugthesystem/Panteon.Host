@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Panteon.Host.Interface;
-using Panteon.Sdk;
 using Panteon.Sdk.Models;
 
 namespace Panteon.Host.API
