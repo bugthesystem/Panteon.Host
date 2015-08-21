@@ -29,8 +29,8 @@ namespace Panteon.Host
         private CompositionContainer _compositionContainer;
         private string TasksFolderPath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.TasksFolderName);
 
-        private IContainer _systemContainer;
-        private ContainerBuilder _syatemContainerBuilder;
+        private IContainer _appContainer;
+        private ContainerBuilder _appContainerBuilder;
         private IDisposable _webApplication;
 
         private ILogger _logger;
@@ -56,13 +56,13 @@ namespace Panteon.Host
 
             InitTasksRegistry();
 
-            _syatemContainerBuilder = new ContainerBuilder();
-            _syatemContainerBuilder.RegisterModule<CoreModule>();
-            _syatemContainerBuilder.RegisterModule<HostingModule>();
-            _systemContainer = _syatemContainerBuilder.Build();
+            _appContainerBuilder = new ContainerBuilder();
+            _appContainerBuilder.RegisterModule<CoreModule>();
+            _appContainerBuilder.RegisterModule<HostingModule>();
+            _appContainer = _appContainerBuilder.Build();
 
             _fileSystemWatcher = new TasksWatcher { OnChanged = OnChanged };
-            _fileSystemWatcher.WathcTaks(TasksFolderPath);
+            _fileSystemWatcher.Watch(TasksFolderPath);
 
             Task.Run(() => StartApi());
         }
@@ -93,6 +93,7 @@ namespace Panteon.Host
             InitTasksRegistry();
 
             Console.WriteLine($"File: {e.FullPath}  {e.ChangeType}");
+
             _logger.Info($"File: {e.FullPath}  {e.ChangeType}");
         }
 
@@ -110,7 +111,7 @@ namespace Panteon.Host
 
         public void Start()
         {
-            _logger = _systemContainer.Resolve<ILogger>();
+            _logger = _appContainer.Resolve<ILogger>();
 
             try
             {
@@ -218,7 +219,7 @@ namespace Panteon.Host
         {
             try
             {
-                _webApplication = WebApp.Start<Startup>("http://localhost:5002");
+                _webApplication = WebApp.Start<Startup>(Constants.ApiStartUrl);
             }
             catch (Exception exception)
             {

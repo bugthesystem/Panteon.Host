@@ -177,9 +177,6 @@
     <Compile Include="Infrastructure\WatchEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Tasks\hello\PlaceHolder.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Tasks\PlaceHolder.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

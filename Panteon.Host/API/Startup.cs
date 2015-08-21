@@ -10,8 +10,6 @@ namespace Panteon.Host.API
 {
     public class Startup
     {
-        private ILifetimeScope _container;
-
         public void Configuration(IAppBuilder appBuilder)
         {
             var config = new HttpConfiguration();
@@ -21,13 +19,12 @@ namespace Panteon.Host.API
             ContainerBuilder containerBuilder = new ContainerBuilder();
 
             containerBuilder.RegisterModule<HostingModule>();
-            // Register your Web API controllers.
+
             containerBuilder.RegisterApiControllers(Assembly.GetExecutingAssembly());
 
-            _container = containerBuilder.Build();
-
-
-            var resolver = new AutofacWebApiDependencyResolver(_container);
+            var container = containerBuilder.Build();
+            
+            var resolver = new AutofacWebApiDependencyResolver(container);
             config.DependencyResolver = resolver;
 
             config.Formatters.Clear();
@@ -38,7 +35,7 @@ namespace Panteon.Host.API
             // OWIN WEB API SETUP:
             // Register the Autofac middleware FIRST, then the Autofac Web API middleware,
             // and finally the standard Web API middleware.
-            appBuilder.UseAutofacMiddleware(_container);
+            appBuilder.UseAutofacMiddleware(container);
             appBuilder.UseAutofacWebApi(config);
             appBuilder.UseWebApi(config);
         }

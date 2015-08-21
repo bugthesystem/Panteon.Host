@@ -2,7 +2,7 @@
 
 namespace Panteon.Host.Tests
 {
-    public class Class1 :TestBase
+    public class PanteonEngineTests :TestBase
     {
     }
 }

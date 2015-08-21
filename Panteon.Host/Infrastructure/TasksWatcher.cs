@@ -8,7 +8,7 @@ namespace Panteon.Host.Infrastructure
     internal sealed class TasksWatcher : IFileSystemWatcher
     {
         [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
-        public void WathcTaks(string path)
+        public void Watch(string path)
         {
             if (!string.IsNullOrEmpty(path))
             {
