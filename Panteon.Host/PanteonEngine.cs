@@ -200,7 +200,8 @@ namespace Panteon.Host
         {
             var task = GetTasks().SingleOrDefault(t => t.Name == name);
 
-            return task != null && task.Bootstrap();
+            //TODO: Call task.Start();
+            return task != null && task.Bootstrap(); //TODO: Bootstrap to Init and Start
         }
 
         public bool UpdateTask(string name, string scheduleExpression)
