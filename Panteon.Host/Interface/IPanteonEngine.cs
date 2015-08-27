@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Panteon.Sdk;
 
 namespace Panteon.Host.Interface
@@ -9,7 +10,7 @@ namespace Panteon.Host.Interface
         void Start();
         void Stop(bool immediate);
         bool StopTask(string name);
-        bool StartTask(string name);
+        bool StartTask(string name, DateTimeOffset lastKnownEvent=(default(DateTimeOffset)));
         bool UpdateTask(string name, string scheduleExpression);
     }
 }

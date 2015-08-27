@@ -119,7 +119,7 @@ namespace Panteon.Host
 
                 foreach (IPanteonTask task in panteonTasks)
                 {
-                    task.Bootstrap();
+                    task.Bootstrap(true);
                 }
             }
             catch (Exception exception)
@@ -156,7 +156,7 @@ namespace Panteon.Host
                                 /*TODO: change detection*/
                                 pair.Value.Container.GetHashCode() != model.Container.GetHashCode() ? pair.Value : model);
 
-                        taskModel?.Task?.Bootstrap();
+                        taskModel?.Task?.Bootstrap(true);
                     }
                     else
                     {
@@ -196,12 +196,11 @@ namespace Panteon.Host
             }
         }
 
-        public bool StartTask(string name)
+        public bool StartTask(string name, DateTimeOffset lastKnownEvent = default(DateTimeOffset))
         {
             var task = GetTasks().SingleOrDefault(t => t.Name == name);
 
-            //TODO: Call task.Start();
-            return task != null && task.Bootstrap(); //TODO: Bootstrap to Init and Start
+            return task != null && task.Start(lastKnownEvent);
         }
 
         public bool UpdateTask(string name, string scheduleExpression)
