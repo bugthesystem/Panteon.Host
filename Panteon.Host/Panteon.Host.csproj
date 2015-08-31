@@ -87,8 +87,8 @@
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Panteon.Sdk, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Panteon.Sdk.1.0.3\lib\net451\Panteon.Sdk.dll</HintPath>
+    <Reference Include="Panteon.Sdk, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Panteon.Sdk.1.0.4\lib\net451\Panteon.Sdk.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PusherServer, Version=2.1.1.0, Culture=neutral, processorArchitecture=MSIL">
