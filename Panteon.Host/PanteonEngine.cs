@@ -119,7 +119,7 @@ namespace Panteon.Host
 
                 foreach (IPanteonTask task in panteonTasks)
                 {
-                    task.Bootstrap(true);
+                    task.Init(autoRun:true);
                 }
             }
             catch (Exception exception)
@@ -156,7 +156,7 @@ namespace Panteon.Host
                                 /*TODO: change detection*/
                                 pair.Value.Container.GetHashCode() != model.Container.GetHashCode() ? pair.Value : model);
 
-                        taskModel?.Task?.Bootstrap(true);
+                        taskModel?.Task?.Init(autoRun:true);
                     }
                     else
                     {
