@@ -57,7 +57,7 @@ namespace Panteon.Host
             InitTasksRegistry();
 
             _appContainerBuilder = new ContainerBuilder();
-            _appContainerBuilder.RegisterModule<CoreModule>();
+            _appContainerBuilder.RegisterModule<WorkerModule>();
             _appContainerBuilder.RegisterModule<HostingModule>();
             _appContainer = _appContainerBuilder.Build();
 
@@ -102,9 +102,9 @@ namespace Panteon.Host
             return $"{Constants.TasksFolderName}\\{Path.GetFileName(folder)}";
         }
 
-        public IEnumerable<IPanteonTask> GetTasks()
+        public IEnumerable<IPanteonWorker> GetTasks()
         {
-            IEnumerable<IPanteonTask> tasks = _taskModelDictionary.Select(pair => pair.Value.Task);
+            IEnumerable<IPanteonWorker> tasks = _taskModelDictionary.Select(pair => pair.Value.Task);
 
             return tasks;
         }
@@ -117,7 +117,7 @@ namespace Panteon.Host
             {
                 var panteonTasks = GetTasks();
 
-                foreach (IPanteonTask task in panteonTasks)
+                foreach (IPanteonWorker task in panteonTasks)
                 {
                     task.Init(autoRun:true);
                 }
@@ -136,7 +136,7 @@ namespace Panteon.Host
                     {
                         var taskContainer = CreateTaskContainer(exports);
 
-                        var panteonTask = taskContainer.Resolve<IPanteonTask>();
+                        var panteonTask = taskContainer.Resolve<IPanteonWorker>();
 
                         return new TaskModel
                         {
@@ -189,7 +189,7 @@ namespace Panteon.Host
 
             if (immediate)
             {
-                foreach (IPanteonTask task in GetTasks())
+                foreach (IPanteonWorker task in GetTasks())
                 {
                     task.Stop();
                 }

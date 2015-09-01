@@ -6,7 +6,7 @@ namespace Panteon.Host.Interface
 {
     public interface IPanteonEngine
     {
-        IEnumerable<IPanteonTask> GetTasks();
+        IEnumerable<IPanteonWorker> GetTasks();
         void Start();
         void Stop(bool immediate);
         bool StopTask(string name);
