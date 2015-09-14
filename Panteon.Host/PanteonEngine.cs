@@ -23,11 +23,18 @@ namespace Panteon.Host
         [ImportMany(typeof(ITaskExports), AllowRecomposition = true)]
         internal ITaskExports[] Exports { get; set; }
 
-        private static readonly Lazy<IPanteonEngine> Lazy = new Lazy<IPanteonEngine>(() => new PanteonEngine(), true);
-        public static IPanteonEngine Instance => Lazy.Value;
+        private static readonly Lazy<IPanteonEngine> LazyEngineInstance = new Lazy<IPanteonEngine>(() => new PanteonEngine(), true);
+
+        public static IPanteonEngine Instance
+        {
+            get { return LazyEngineInstance.Value; }
+        }
 
         private CompositionContainer _compositionContainer;
-        private string TasksFolderPath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.TasksFolderName);
+        private string TasksFolderPath
+        {
+            get { return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.TasksFolderName); }
+        }
 
         private IContainer _appContainer;
         private ContainerBuilder _appContainerBuilder;
@@ -40,10 +47,10 @@ namespace Panteon.Host
 
         protected PanteonEngine()
         {
-            Init();
+            Bootstrap();
         }
 
-        private void Init()
+        private void Bootstrap()
         {
             _taskModelDictionary = new ConcurrentDictionary<string, TaskModel>();
 
@@ -72,34 +79,34 @@ namespace Panteon.Host
             var catalog = (AggregateCatalog)_compositionContainer.Catalog;
             var folders = Directory.GetDirectories(TasksFolderPath, "*", SearchOption.AllDirectories);
 
-            foreach (string folder in folders)
+            foreach (string f in folders)
             {
+                var folderPath = f;
                 Func<ComposablePartCatalog, bool> predicate = composablePartCatalog =>
                 {
-                    var catalog1 = composablePartCatalog as DirectoryCatalog;
+                    var directoryCatalog = composablePartCatalog as DirectoryCatalog;
 
-                    string path = GetPathName(folder);
+                    string path = GetPathName(folderPath);
 
-                    return catalog1 != null && (catalog1.Path == path || catalog1.Path == folder);
+                    return directoryCatalog != null && (directoryCatalog.Path == path || directoryCatalog.Path == folderPath);
                 };
 
                 if (catalog.Catalogs.Count(predicate) > 0)
                     continue;
 
-                var directoryCatalog = new DirectoryCatalog(folder);
-                catalog.Catalogs.Add(directoryCatalog);
+                catalog.Catalogs.Add(new DirectoryCatalog(folderPath));
             }
 
             InitTasksRegistry();
 
-            Console.WriteLine($"File: {e.FullPath}  {e.ChangeType}");
+            Console.WriteLine("File: {0}  {1}", e.FullPath, e.ChangeType);
 
-            _logger.Info($"File: {e.FullPath}  {e.ChangeType}");
+            _logger.Info(string.Format("File: {0}  {1}", e.FullPath, e.ChangeType));
         }
 
         private string GetPathName(string folder)
         {
-            return $"{Constants.TasksFolderName}\\{Path.GetFileName(folder)}";
+            return string.Format("{0}\\{1}", Constants.TasksFolderName, Path.GetFileName(folder));
         }
 
         public IEnumerable<IPanteonWorker> GetTasks()
@@ -119,7 +126,7 @@ namespace Panteon.Host
 
                 foreach (IPanteonWorker task in panteonTasks)
                 {
-                    task.Init(autoRun:true);
+                    task.Init(autoRun: true);
                 }
             }
             catch (Exception exception)
@@ -156,7 +163,8 @@ namespace Panteon.Host
                                 /*TODO: change detection*/
                                 pair.Value.Container.GetHashCode() != model.Container.GetHashCode() ? pair.Value : model);
 
-                        taskModel?.Task?.Init(autoRun:true);
+                        if (taskModel != null && taskModel.Task != null)
+                            taskModel.Task.Init(autoRun: true);
                     }
                     else
                     {
