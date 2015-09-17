@@ -5,7 +5,7 @@ using Panteon.Host.Interface;
 
 namespace Panteon.Host.Infrastructure
 {
-    internal sealed class TasksWatcher : IFileSystemWatcher
+    internal sealed class JobsWatcher : IFileSystemWatcher
     {
         [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
         public void Watch(string path)

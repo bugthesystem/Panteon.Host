@@ -33,7 +33,7 @@ namespace Panteon.Host
         private CompositionContainer _compositionContainer;
         private string TasksFolderPath
         {
-            get { return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.TasksFolderName); }
+            get { return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Config.JobsFolderName); }
         }
 
         private IContainer _appContainer;
@@ -43,7 +43,7 @@ namespace Panteon.Host
         private ILogger _logger;
         private IFileSystemWatcher _fileSystemWatcher;
 
-        private ConcurrentDictionary<string, TaskModel> _taskModelDictionary;
+        private ConcurrentDictionary<string, JobModel> _jobModelRegistry;
 
         protected PanteonEngine()
         {
@@ -52,11 +52,11 @@ namespace Panteon.Host
 
         private void Bootstrap()
         {
-            _taskModelDictionary = new ConcurrentDictionary<string, TaskModel>();
+            _jobModelRegistry = new ConcurrentDictionary<string, JobModel>();
 
             _compositionContainer = new CatalogConfigurator()
                .AddAssembly(Assembly.GetExecutingAssembly())
-               .AddNestedDirectory(Constants.TasksFolderName)
+               .AddNestedDirectory(Config.JobsFolderName)
                .BuildContainer();
 
             _compositionContainer.ComposeParts(this);
@@ -68,10 +68,14 @@ namespace Panteon.Host
             _appContainerBuilder.RegisterModule<HostingModule>();
             _appContainer = _appContainerBuilder.Build();
 
-            _fileSystemWatcher = new TasksWatcher { OnChanged = OnChanged };
+            _fileSystemWatcher = new JobsWatcher { OnChanged = OnChanged };
             _fileSystemWatcher.Watch(TasksFolderPath);
 
-            Task.Run(() => StartApi());
+            _logger = _appContainer.Resolve<ILogger>();
+
+            _logger.Info("[START] PanteonEngine");
+
+            Task.Run(() => MountApi());
         }
 
         private void OnChanged(WatchEventArgs e)
@@ -82,7 +86,7 @@ namespace Panteon.Host
             foreach (string f in folders)
             {
                 var folderPath = f;
-                Func<ComposablePartCatalog, bool> predicate = composablePartCatalog =>
+                Func<ComposablePartCatalog, bool> catalogPredicate = composablePartCatalog =>
                 {
                     var directoryCatalog = composablePartCatalog as DirectoryCatalog;
 
@@ -91,7 +95,7 @@ namespace Panteon.Host
                     return directoryCatalog != null && (directoryCatalog.Path == path || directoryCatalog.Path == folderPath);
                 };
 
-                if (catalog.Catalogs.Count(predicate) > 0)
+                if (catalog.Catalogs.Count(catalogPredicate) > 0)
                     continue;
 
                 catalog.Catalogs.Add(new DirectoryCatalog(folderPath));
@@ -101,25 +105,23 @@ namespace Panteon.Host
 
             Console.WriteLine("File: {0}  {1}", e.FullPath, e.ChangeType);
 
-            _logger.Info(string.Format("File: {0}  {1}", e.FullPath, e.ChangeType));
+            _logger.Info(string.Format("[ON_CHANGED] File: {0}  {1}", e.FullPath, e.ChangeType));
         }
 
         private string GetPathName(string folder)
         {
-            return string.Format("{0}\\{1}", Constants.TasksFolderName, Path.GetFileName(folder));
+            return string.Format("{0}\\{1}", Config.JobsFolderName, Path.GetFileName(folder));
         }
 
         public IEnumerable<IPanteonWorker> GetTasks()
         {
-            IEnumerable<IPanteonWorker> tasks = _taskModelDictionary.Select(pair => pair.Value.Task);
+            IEnumerable<IPanteonWorker> tasks = _jobModelRegistry.Select(pair => pair.Value.Task);
 
             return tasks;
         }
 
         public void Start()
         {
-            _logger = _appContainer.Resolve<ILogger>();
-
             try
             {
                 var panteonTasks = GetTasks();
@@ -131,13 +133,13 @@ namespace Panteon.Host
             }
             catch (Exception exception)
             {
-                _logger.Error("An error occurred while starting Panteon Host.", exception);
+                _logger.Error("[ERROR] An error occurred while starting Panteon Host.", exception);
             }
         }
 
         private void InitTasksRegistry()
         {
-            Dictionary<string, TaskModel> taskModels =
+            Dictionary<string, JobModel> taskModels =
                 Exports.ToDictionary(exports => exports.GetType().Assembly.FullName,
                     exports =>
                     {
@@ -145,26 +147,26 @@ namespace Panteon.Host
 
                         var panteonTask = taskContainer.Resolve<IPanteonWorker>();
 
-                        return new TaskModel
+                        return new JobModel
                         {
                             Task = panteonTask,
                             Container = taskContainer
                         };
                     });
 
-            if (_taskModelDictionary.Any())
+            if (_jobModelRegistry.Any())
             {
-                foreach (KeyValuePair<string, TaskModel> pair in taskModels)
+                foreach (KeyValuePair<string, JobModel> pair in taskModels)
                 {
-                    if (!_taskModelDictionary.ContainsKey(pair.Key))
+                    if (!_jobModelRegistry.ContainsKey(pair.Key))
                     {
-                        TaskModel taskModel = _taskModelDictionary.AddOrUpdate(pair.Key, pair.Value,
+                        JobModel jobModel = _jobModelRegistry.AddOrUpdate(pair.Key, pair.Value,
                             (s, model) =>
                                 /*TODO: change detection*/
                                 pair.Value.Container.GetHashCode() != model.Container.GetHashCode() ? pair.Value : model);
 
-                        if (taskModel != null && taskModel.Task != null)
-                            taskModel.Task.Init(autoRun: true);
+                        if (jobModel != null && jobModel.Task != null)
+                            jobModel.Task.Init(autoRun: true);
                     }
                     else
                     {
@@ -180,7 +182,7 @@ namespace Panteon.Host
             }
             else
             {
-                _taskModelDictionary = new ConcurrentDictionary<string, TaskModel>(taskModels);
+                _jobModelRegistry = new ConcurrentDictionary<string, JobModel>(taskModels);
             }
         }
 
@@ -223,15 +225,16 @@ namespace Panteon.Host
             return task != null && task.Stop();
         }
 
-        private void StartApi()
+        private void MountApi()
         {
             try
             {
-                _webApplication = WebApp.Start<Startup>(Constants.ApiStartUrl);
+                _webApplication = WebApp.Start<Startup>(Config.ApiStartUrl);
+                _logger.Info("[START] Panteon REST API");
             }
             catch (Exception exception)
             {
-                _logger.Error("An error occurred while starting Panteon API", exception);
+                _logger.Error("[ERROR] An error occurred while starting Panteon API", exception);
             }
         }
     }

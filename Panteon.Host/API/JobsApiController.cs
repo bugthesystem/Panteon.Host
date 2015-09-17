@@ -9,20 +9,20 @@ using Panteon.Sdk.Models;
 namespace Panteon.Host.API
 {
     [RoutePrefix("tasks")]
-    public class TaskController : ApiController
+    public class JobsApiController : ApiController
     {
-        private readonly IPanteonEngine _panteon;
+        private readonly IPanteonEngine _panteonEngine;
 
-        public TaskController(IPanteonEngine panteon)
+        public JobsApiController(IPanteonEngine panteonEngine)
         {
-            _panteon = panteon;
+            _panteonEngine = panteonEngine;
         }
 
         [HttpGet]
         [Route("")]
         public Task<List<PanteonTaskInfo>> Get()
         {
-            List<PanteonTaskInfo> result = _panteon.GetTasks().Select(task => task.Inspect()).ToList();
+            List<PanteonTaskInfo> result = _panteonEngine.GetTasks().Select(task => task.Inspect()).ToList();
 
             return Task.FromResult(result);
         }
@@ -31,7 +31,7 @@ namespace Panteon.Host.API
         [Route("stop/{name}")]
         public IHttpActionResult Stop(string name)
         {
-            bool ok = _panteon.StopTask(name);
+            bool ok = _panteonEngine.StopTask(name);
             if (ok)
             {
                 return Ok();
@@ -44,7 +44,7 @@ namespace Panteon.Host.API
         [Route("start/{name}")]
         public IHttpActionResult Start(string name)
         {
-            bool ok = _panteon.StartTask(name);
+            bool ok = _panteonEngine.StartTask(name);
             if (ok)
             {
                 return Ok();
