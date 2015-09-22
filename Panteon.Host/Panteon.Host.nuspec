@@ -13,8 +13,8 @@
     <tags>task scheduler</tags>
   </metadata>
   <files>
-    <file src="bin\Debug\**\*.*" exclude="bin\Debug\*.ps1;bin\Debug\Tasks\*.dll.config;" target="Debug"/>
-    <file src="bin\Release\**\*.*" exclude="bin\Release\*.ps1;bin\Release\Tasks\*.dll.config;" target="Release"/>
-    <file src="bin\Release\Deploy.ps1"/>
+    <file src="Debug\**\*.*" exclude="bin\Debug\*.ps1;bin\Debug\Tasks\*.dll.config;" target="Debug"/>
+    <file src="Release\**\*.*" exclude="bin\Release\*.ps1;bin\Release\Tasks\*.dll.config;" target="Release"/>
+    <file src="Release\Deploy.ps1"/>
   </files>
 </package>
