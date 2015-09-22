@@ -26,15 +26,6 @@ function copyRecursive([string]$sourceFolder, [string]$targetFolder, [string]$re
     }
 }
 
-# $sp1 = 'D:\Projects\TY.Web\Services\MobileService_Rest\WindowsService\bin\Release'
-# $tp1 = 'C:\@Sites'
-# $ex1 = '\\App_Data|.config$'
-# copyRecursive $sp1 $tp1 $ex1
-
-#$OctopusPackagePath = "C:\Octopus\Tentacle\Applications\TY.MobileService.0.0.12072.10"
-#$OctopusEnvironmentName = "Production"
-#$OctopusPackageName = "TY.MobileService"
-
 if(! $ServiceName)
 {
 	$ServiceName = $OctopusPackageName

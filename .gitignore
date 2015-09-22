@@ -104,7 +104,7 @@ UpgradeLog*.XML
 *.nupkg
 
 #Exclude Octopus Jenkins build file extensions
-*.nuspec
-*.ps1
-Panteon.Host/Panteon.Host.nuspec
-Panteon.Host/Deploy.ps1
+#*.nuspec
+#*.ps1
+#Panteon.Host/Panteon.Host.nuspec
+#Panteon.Host/Deploy.ps1
