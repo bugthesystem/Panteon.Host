@@ -47,7 +47,7 @@ Sample appSettings node;
 ```xml
  <appSettings>
     <add key="PANTEON_JOBS_FOLDER" value="C:\@Panteon\Jobs"/>
-    <add key="PANTEON_REST_API_URL" value="http://localhost:5002"/>
+    <add key="PANTEON_REST_API_URL" value="http://+:8080/"/>
   </appSettings>
 ```
 
