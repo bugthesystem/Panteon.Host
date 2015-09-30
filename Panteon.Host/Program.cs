@@ -31,7 +31,7 @@ namespace Panteon.Host
                     recovery.OnCrashOnly();
                 });
 
-                configurator.RunAsLocalSystem();
+                configurator.RunAsNetworkService();
                 configurator.StartAutomatically();
                 configurator.EnableShutdown();
 
