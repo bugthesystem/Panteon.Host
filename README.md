@@ -7,7 +7,7 @@ Setup
 
 ###(Optional) Add an HTTP URL Namespace Reservation
 
-This application listens to http://localhost:8080/. By default, listening at a particular HTTP address requires administrator privileges. When you run the host, therefore, you may get this error: `"HTTP could not register URL http://+:8080/"`   
+This application listens to `http://localhost:8080/`. By default, listening at a particular HTTP address requires administrator privileges. When you run the host, therefore, you may get this error: `"HTTP could not register URL http://+:8080/"`   
 
 There are two ways to avoid this error:
 
