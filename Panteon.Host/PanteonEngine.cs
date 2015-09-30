@@ -18,12 +18,19 @@ using Panteon.Sdk;
 
 namespace Panteon.Host
 {
-    internal class PanteonEngine : IPanteonEngine
+    internal class PanteonEngine : MarshalByRefObject, IPanteonEngine
     {
         [ImportMany(typeof(ITaskExports), AllowRecomposition = true)]
         internal ITaskExports[] Exports { get; set; }
 
-        private static readonly Lazy<IPanteonEngine> LazyEngineInstance = new Lazy<IPanteonEngine>(() => new PanteonEngine(), true);
+        private static readonly Lazy<IPanteonEngine> LazyEngineInstance = new Lazy<IPanteonEngine>(EngineFactory(), true);
+
+        private static Func<IPanteonEngine> EngineFactory()
+        {
+            return () => (PanteonEngine)HostDomain.CreateInstanceAndUnwrap(typeof(PanteonEngine).Assembly.FullName, typeof(PanteonEngine).FullName);
+        }
+
+        public static AppDomain HostDomain { get; set; }
 
         public static IPanteonEngine Instance
         {
@@ -31,6 +38,7 @@ namespace Panteon.Host
         }
 
         private CompositionContainer _compositionContainer;
+
         private string TasksFolderPath
         {
             get { return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Config.JobsFolderName); }
@@ -40,12 +48,13 @@ namespace Panteon.Host
         private ContainerBuilder _appContainerBuilder;
         private IDisposable _webApplication;
 
+
         private ILogger _logger;
         private IFileSystemWatcher _fileSystemWatcher;
 
         private ConcurrentDictionary<string, JobModel> _jobModelRegistry;
 
-        protected PanteonEngine()
+        public PanteonEngine()
         {
             Bootstrap();
         }
@@ -58,6 +67,7 @@ namespace Panteon.Host
                .AddAssembly(Assembly.GetExecutingAssembly())
                .AddNestedDirectory(Config.JobsFolderName)
                .BuildContainer();
+
 
             _compositionContainer.ComposeParts(this);
 

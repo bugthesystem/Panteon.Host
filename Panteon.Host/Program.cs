@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using Panteon.Host.Infrastructure;
 using Panteon.Host.Interface;
 using Topshelf;
 
@@ -8,8 +10,29 @@ namespace Panteon.Host
 {
     public class Program
     {
+        private static AppDomain _domain;
+
+        [STAThread]
         public static void Main(string[] args)
         {
+            var cachePath = Path.Combine(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\"), "ShadowCopyCache");
+
+            if (!Directory.Exists(cachePath))
+            {
+                Directory.CreateDirectory(cachePath);
+            }
+
+            //This creates a ShadowCopy of the MEF DLL's (and any other DLL's in the ShadowCopyDirectories)
+            var setup = new AppDomainSetup
+            {
+                CachePath = cachePath,
+                ShadowCopyFiles = "true",
+                ShadowCopyDirectories = Config.JobsFolderName
+            };
+
+            _domain = AppDomain.CreateDomain("Host_AppDomain", AppDomain.CurrentDomain.Evidence, setup);
+            PanteonEngine.HostDomain = _domain;
+
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
             HostFactory.Run(configurator =>
@@ -18,7 +41,12 @@ namespace Panteon.Host
                 {
                     s.ConstructUsing(settings => PanteonEngine.Instance);
                     s.WhenStarted(tc => tc.Start());
-                    s.WhenStopped(tc => tc.Stop(true));
+                    s.WhenStopped(tc =>
+                    {
+                        tc.Stop(true);
+
+                        AppDomain.Unload(_domain);
+                    });
                 });
 
                 configurator.BeforeInstall(settings => { });
