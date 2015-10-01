@@ -31,7 +31,6 @@ namespace Panteon.Host
             };
 
             _domain = AppDomain.CreateDomain("Host_AppDomain", AppDomain.CurrentDomain.Evidence, setup);
-            PanteonEngine.HostDomain = _domain;
 
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
@@ -44,7 +43,6 @@ namespace Panteon.Host
                     s.WhenStopped(tc =>
                     {
                         tc.Stop(true);
-
                         AppDomain.Unload(_domain);
                     });
                 });

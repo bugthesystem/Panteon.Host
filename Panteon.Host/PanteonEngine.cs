@@ -27,10 +27,8 @@ namespace Panteon.Host
 
         private static Func<IPanteonEngine> EngineFactory()
         {
-            return () => (PanteonEngine)HostDomain.CreateInstanceAndUnwrap(typeof(PanteonEngine).Assembly.FullName, typeof(PanteonEngine).FullName);
+            return () => (PanteonEngine)AppDomain.CurrentDomain.CreateInstanceAndUnwrap(typeof(PanteonEngine).Assembly.FullName, typeof(PanteonEngine).FullName);
         }
-
-        public static AppDomain HostDomain { get; set; }
 
         public static IPanteonEngine Instance
         {
