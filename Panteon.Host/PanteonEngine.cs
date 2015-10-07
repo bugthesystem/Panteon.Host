@@ -76,6 +76,7 @@ namespace Panteon.Host
             _appContainerBuilder.RegisterModule<HostingModule>();
             _appContainer = _appContainerBuilder.Build();
 
+             //TODO: make onchanged to an event
             _fileSystemWatcher = new JobsWatcher { OnChanged = OnChanged };
             _fileSystemWatcher.Watch(TasksFolderPath);
 
