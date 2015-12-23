@@ -30,17 +30,11 @@ namespace Panteon.Host
             return () => (PanteonEngine)AppDomain.CurrentDomain.CreateInstanceAndUnwrap(typeof(PanteonEngine).Assembly.FullName, typeof(PanteonEngine).FullName);
         }
 
-        public static IPanteonEngine Instance
-        {
-            get { return LazyEngineInstance.Value; }
-        }
+        public static IPanteonEngine Instance => LazyEngineInstance.Value;
 
         private CompositionContainer _compositionContainer;
 
-        private string TasksFolderPath
-        {
-            get { return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Config.JobsFolderName); }
-        }
+        private string TasksFolderPath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Config.JobsFolderName);
 
         private IContainer _appContainer;
         private ContainerBuilder _appContainerBuilder;
@@ -114,12 +108,12 @@ namespace Panteon.Host
 
             Console.WriteLine("File: {0}  {1}", e.FullPath, e.ChangeType);
 
-            _logger.Info(string.Format("[ON_CHANGED] File: {0}  {1}", e.FullPath, e.ChangeType));
+            _logger.Info($"[ON_CHANGED] File: {e.FullPath}  {e.ChangeType}");
         }
 
         private string GetPathName(string folder)
         {
-            return string.Format("{0}\\{1}", Config.JobsFolderName, Path.GetFileName(folder));
+            return $"{Config.JobsFolderName}\\{Path.GetFileName(folder)}";
         }
 
         public IEnumerable<IPanteonWorker> GetTasks()
@@ -174,8 +168,7 @@ namespace Panteon.Host
                                 /*TODO: change detection*/
                                 pair.Value.Container.GetHashCode() != model.Container.GetHashCode() ? pair.Value : model);
 
-                        if (jobModel != null && jobModel.Task != null)
-                            jobModel.Task.Init(autoRun: true);
+                        jobModel?.Task?.Init(autoRun: true);
                     }
                     else
                     {
