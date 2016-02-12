@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Panteon.Host.Interface;
+using Panteon.Sdk.History;
 using Panteon.Sdk.Models;
 
 namespace Panteon.Host.API
@@ -53,6 +54,15 @@ namespace Panteon.Host.API
             return BadRequest();
         }
 
+
+        [HttpGet]
+        [Route("history/{name}/{startDate}/{endDate}")]
+        public IHttpActionResult History(string name, DateTime? startDate, DateTime? endDate)
+        {
+            IEnumerable<HistoryModel> historyModels = _panteonEngine.LoadHistory(name,startDate,endDate);
+           
+            return Ok(historyModels);
+        }
 
         [HttpGet]
         [Route("echo")]

@@ -15,6 +15,7 @@ using Panteon.Host.API;
 using Panteon.Host.Infrastructure;
 using Panteon.Host.Interface;
 using Panteon.Sdk;
+using Panteon.Sdk.History;
 
 namespace Panteon.Host
 {
@@ -70,7 +71,7 @@ namespace Panteon.Host
             _appContainerBuilder.RegisterModule<HostingModule>();
             _appContainer = _appContainerBuilder.Build();
 
-             //TODO: make onchanged to an event
+            //TODO: make onchanged to an event
             _fileSystemWatcher = new JobsWatcher { OnChanged = OnChanged };
             _fileSystemWatcher.Watch(TasksFolderPath);
 
@@ -218,6 +219,18 @@ namespace Panteon.Host
         public bool UpdateTask(string name, string scheduleExpression)
         {
             throw new NotImplementedException();
+        }
+
+        public IEnumerable<HistoryModel> LoadHistory(string name, DateTime? @from, DateTime? to)
+        {
+            var task = GetTasks().SingleOrDefault(t => t.Name == name);
+
+            if (task != null)
+            {
+                return task.LoadHistory(@from, to);
+            }
+
+            return Enumerable.Empty<HistoryModel>();
         }
 
         public bool StopTask(string name)
