@@ -41,13 +41,25 @@ Panteon.Host.exe install
 **PANTEON_JOBS_FOLDER**  
 Jobs folder path  
 **PANTEON_REST_API_URL**  
-Jobs REST API start url  
+Jobs REST API start url 
+
+#####(Optional) RealtimePanteonWorker Settings
+
+**PS_APP_ID**  
+Pusher App Id  
+**PS_APP_KEY**  
+Pusher App Key  
+**PS_APP_SECRET**  
+Pusher App Secret  
 
 Sample appSettings node;  
 ```xml
  <appSettings>
     <add key="PANTEON_JOBS_FOLDER" value="C:\@Panteon\Jobs"/>
     <add key="PANTEON_REST_API_URL" value="http://+:8080/"/>
+    <add key="PS_APP_ID" value="PusherAppId" />
+    <add key="PS_APP_KEY" value="PusherAppKey" />
+    <add key="PS_APP_SECRET" value="PusherAppSecret" />
   </appSettings>
 ```
 
