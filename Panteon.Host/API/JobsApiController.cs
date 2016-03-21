@@ -56,12 +56,12 @@ namespace Panteon.Host.API
 
 
         [HttpGet]
-        [Route("history/{name}/{startDate}/{endDate}")]
-        public IHttpActionResult History(string name, DateTime? startDate, DateTime? endDate)
+        [Route("history/{name}")]
+        public IHttpActionResult History(string name)
         {
-            IEnumerable<HistoryModel> historyModels = _panteonEngine.LoadHistory(name,startDate,endDate);
+            IEnumerable<HistoryModel> historyModels = _panteonEngine.LoadHistory(name,null,null);
            
-            return Ok(historyModels);
+            return Ok(historyModels.OrderByDescending(model => model.DateCreated));
         }
 
         [HttpGet]
